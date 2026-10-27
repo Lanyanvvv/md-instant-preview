@@ -1,0 +1,83 @@
+{
+  "name": "md-instant-preview",
+  "displayName": "Markdown 即时渲染预览",
+  "description": "打开 Markdown 文件时默认显示渲染视图，双击在预览/编辑模式间切换并保持位置同步。兼容 VS Code、Cursor、Antigravity 等编辑器。",
+  "version": "1.2.0",
+  "publisher": "lanyan",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onCustomEditor:mdPreview.markdownEditor"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "mdPreview.markdownEditor",
+        "displayName": "Markdown 即时渲染预览",
+        "selector": [
+          { "filenamePattern": "*.md" },
+          { "filenamePattern": "*.markdown" }
+        ],
+        "priority": "default"
+      }
+    ],
+    "commands": [
+      {
+        "command": "mdPreview.switchToEdit",
+        "title": "切换到编辑模式",
+        "icon": "$(edit)",
+        "category": "Markdown 预览"
+      },
+      {
+        "command": "mdPreview.switchToPreview",
+        "title": "切换到预览模式",
+        "icon": "$(open-preview)",
+        "category": "Markdown 预览"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "mdPreview.switchToEdit",
+          "when": "activeCustomEditorId == 'mdPreview.markdownEditor'",
+          "group": "navigation"
+        },
+        {
+          "command": "mdPreview.switchToPreview",
+          "when": "resourceLangId == markdown && activeCustomEditorId != 'mdPreview.markdownEditor'",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Markdown 即时渲染预览",
+      "properties": {
+        "mdPreview.theme": {
+          "type": "string",
+          "default": "github",
+          "enum": ["github"],
+          "enumDescriptions": ["GitHub 风格主题（暗色/亮色自适应）"],
+          "description": "Markdown 渲染主题样式，后续可扩展更多主题"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "node ./esbuild.js",
+    "watch": "node ./esbuild.js --watch",
+    "package": "npx @vscode/vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "marked": "^12.0.0",
+    "marked-highlight": "^2.1.0",
+    "highlight.js": "^11.10.0"
+  }
+}

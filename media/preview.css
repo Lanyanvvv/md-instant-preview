@@ -1,0 +1,526 @@
+/*
+ * Markdown 即时渲染预览 — GitHub 风格样式
+ * 
+ * 自动适配 VS Code 暗色/亮色主题（通过 CSS 变量）
+ * 预留主题扩展接口：通过修改 CSS 自定义属性即可切换风格
+ * 
+ * 主题扩展说明：
+ * - 所有颜色均通过 CSS 自定义属性定义在 :root 中
+ * - 切换主题时只需替换 :root 下的变量值
+ * - 暗色/亮色适配通过 body.vscode-dark / body.vscode-light 选择器实现
+ */
+
+/* ========== 主题变量定义（扩展接口） ========== */
+:root {
+  /* 基础色 */
+  --md-bg: var(--vscode-editor-background, #ffffff);
+  --md-fg: var(--vscode-editor-foreground, #24292e);
+  --md-secondary: var(--vscode-descriptionForeground, #586069);
+  --md-border: var(--vscode-panel-border, #e1e4e8);
+  --md-link: var(--vscode-textLink-foreground, #0366d6);
+  --md-link-hover: var(--vscode-textLink-activeForeground, #0056b3);
+
+  /* 代码块 */
+  --md-code-bg: var(--vscode-textCodeBlock-background, #f6f8fa);
+  --md-code-inline-bg: rgba(175, 184, 193, 0.2);
+  --md-code-fg: var(--vscode-editor-foreground, #24292e);
+
+  /* 引用块 */
+  --md-blockquote-border: var(--vscode-textBlockQuote-border, #dfe2e5);
+  --md-blockquote-bg: var(--vscode-textBlockQuote-background, transparent);
+  --md-blockquote-fg: var(--vscode-descriptionForeground, #6a737d);
+
+  /* 表格 */
+  --md-table-border: var(--vscode-panel-border, #dfe2e5);
+  --md-table-header-bg: var(--vscode-editorGroupHeader-tabsBackground, #f6f8fa);
+  --md-table-stripe-bg: rgba(0, 0, 0, 0.02);
+
+  /* 分隔线 */
+  --md-hr-color: var(--vscode-panel-border, #e1e4e8);
+
+  /* 间距 */
+  --md-content-padding: 40px;
+  --md-max-width: 900px;
+
+  /* 字体 */
+  --md-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans',
+    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --md-mono-font: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --md-font-size: 16px;
+  --md-line-height: 1.6;
+}
+
+/* ========== 基础样式 ========== */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--md-bg);
+  color: var(--md-fg);
+  font-family: var(--md-font-family);
+  font-size: var(--md-font-size);
+  line-height: var(--md-line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  cursor: default;
+}
+
+/* ========== Markdown 内容容器 ========== */
+.markdown-body {
+  max-width: var(--md-max-width);
+  margin: 0 auto;
+  padding: var(--md-content-padding);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ========== 标题 ========== */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--md-fg);
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--md-border);
+}
+
+.markdown-body h2 {
+  font-size: 1.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--md-border);
+}
+
+.markdown-body h3 { font-size: 1.25em; }
+.markdown-body h4 { font-size: 1em; }
+.markdown-body h5 { font-size: 0.875em; }
+.markdown-body h6 { font-size: 0.85em; color: var(--md-secondary); }
+
+/* ========== 段落和文本 ========== */
+.markdown-body p {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.markdown-body strong { font-weight: 600; }
+.markdown-body em { font-style: italic; }
+.markdown-body del { text-decoration: line-through; color: var(--md-secondary); }
+
+/* ========== 链接 ========== */
+.markdown-body a {
+  color: var(--md-link);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.markdown-body a:hover {
+  color: var(--md-link-hover);
+  text-decoration: underline;
+}
+
+/* ========== 行内代码 ========== */
+.markdown-body code {
+  font-family: var(--md-mono-font);
+  font-size: 85%;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  background: var(--md-code-inline-bg);
+  border-radius: 6px;
+}
+
+/* ========== 代码块 ========== */
+.markdown-body pre {
+  position: relative;
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background: var(--md-code-bg);
+  border-radius: 8px;
+  border: 1px solid var(--md-border);
+  transition: border-color 0.2s ease;
+}
+
+.markdown-body pre:hover {
+  border-color: var(--md-link);
+}
+
+.markdown-body pre code {
+  display: block;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  line-height: inherit;
+  word-wrap: normal;
+  background: transparent;
+  border: 0;
+  font-size: 100%;
+  border-radius: 0;
+  color: var(--md-code-fg);
+}
+
+/* ========== 代码复制按钮 ========== */
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: var(--md-font-family);
+  color: var(--md-secondary);
+  background: var(--md-bg);
+  border: 1px solid var(--md-border);
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: 10;
+  user-select: none;
+}
+
+.markdown-body pre:hover .copy-btn {
+  opacity: 1;
+}
+
+.copy-btn:hover {
+  color: var(--md-fg);
+  background: var(--md-code-bg);
+  border-color: var(--md-link);
+}
+
+.copy-btn.copied {
+  color: #2ea043;
+  border-color: #2ea043;
+  opacity: 1;
+}
+
+/* ========== 引用块 ========== */
+.markdown-body blockquote {
+  margin: 0 0 16px 0;
+  padding: 0.5em 1em;
+  color: var(--md-blockquote-fg);
+  background: var(--md-blockquote-bg);
+  border-left: 4px solid var(--md-blockquote-border);
+  border-radius: 0 4px 4px 0;
+}
+
+.markdown-body blockquote > :first-child { margin-top: 0; }
+.markdown-body blockquote > :last-child { margin-bottom: 0; }
+
+/* ========== 列表 ========== */
+.markdown-body ul,
+.markdown-body ol {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-left: 2em;
+}
+
+.markdown-body li {
+  margin-bottom: 4px;
+}
+
+.markdown-body li + li {
+  margin-top: 0.25em;
+}
+
+.markdown-body li > p {
+  margin-top: 16px;
+}
+
+/* 任务列表 */
+.markdown-body ul li input[type="checkbox"] {
+  margin-right: 0.5em;
+  vertical-align: middle;
+}
+
+/* ========== 表格 ========== */
+.markdown-body table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  overflow: auto;
+  font-size: 14px;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  padding: 8px 16px;
+  border: 1px solid var(--md-table-border);
+  text-align: left;
+}
+
+.markdown-body table th {
+  font-weight: 600;
+  background: var(--md-table-header-bg);
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background: var(--md-table-stripe-bg);
+}
+
+/* ========== 分隔线 ========== */
+.markdown-body hr {
+  height: 2px;
+  margin: 24px 0;
+  padding: 0;
+  background: var(--md-hr-color);
+  border: 0;
+  border-radius: 1px;
+}
+
+/* ========== 图片 ========== */
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* ========== 位置同步高亮动画 ========== */
+/* 从编辑态切回预览态时，高亮闪烁目标元素帮助用户定位 */
+.source-line-highlight {
+  animation: highlight-flash 1.5s ease-out;
+  border-radius: 4px;
+}
+
+@keyframes highlight-flash {
+  0% {
+    background-color: rgba(255, 213, 79, 0.5);
+    box-shadow: 0 0 0 3px rgba(255, 213, 79, 0.3);
+  }
+  50% {
+    background-color: rgba(255, 213, 79, 0.25);
+    box-shadow: 0 0 0 2px rgba(255, 213, 79, 0.15);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* 暗色主题下的高亮颜色调整 */
+body.vscode-dark .source-line-highlight {
+  animation: highlight-flash-dark 1.5s ease-out;
+}
+
+@keyframes highlight-flash-dark {
+  0% {
+    background-color: rgba(255, 183, 77, 0.35);
+    box-shadow: 0 0 0 3px rgba(255, 183, 77, 0.2);
+  }
+  50% {
+    background-color: rgba(255, 183, 77, 0.15);
+    box-shadow: 0 0 0 2px rgba(255, 183, 77, 0.1);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* ========== 编辑提示浮层 ========== */
+.edit-hint {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--md-fg);
+  background: var(--md-code-bg);
+  border: 1px solid var(--md-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+}
+
+.edit-hint.show {
+  opacity: 0.9;
+  transform: translateY(0);
+}
+
+.edit-hint-icon {
+  font-size: 16px;
+}
+
+/* ========== highlight.js 代码高亮色（VS Code 主题自适应） ========== */
+
+/* 关键字 */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-link {
+  color: var(--vscode-debugTokenExpression-name, #d73a49);
+}
+
+/* 字符串 */
+.hljs-string,
+.hljs-addition {
+  color: var(--vscode-debugTokenExpression-string, #032f62);
+}
+
+/* 注释 */
+.hljs-comment,
+.hljs-quote,
+.hljs-deletion {
+  color: var(--vscode-debugTokenExpression-value, #6a737d);
+  font-style: italic;
+}
+
+/* 数字 / 布尔 */
+.hljs-number,
+.hljs-regexp,
+.hljs-literal,
+.hljs-bullet {
+  color: var(--vscode-debugTokenExpression-number, #005cc5);
+}
+
+/* 类型 / 标题 */
+.hljs-type,
+.hljs-title,
+.hljs-class .hljs-title {
+  color: var(--vscode-symbolIcon-classForeground, #6f42c1);
+}
+
+/* 函数名 */
+.hljs-title.function_,
+.hljs-function .hljs-title {
+  color: var(--vscode-symbolIcon-functionForeground, #6f42c1);
+}
+
+/* 变量 / 属性 */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attr {
+  color: var(--vscode-symbolIcon-variableForeground, #e36209);
+}
+
+/* 内置对象 */
+.hljs-built_in,
+.hljs-builtin-name {
+  color: var(--vscode-debugTokenExpression-name, #005cc5);
+}
+
+/* 元信息 / 标签 */
+.hljs-meta,
+.hljs-tag {
+  color: var(--md-secondary);
+}
+
+/* 标签属性名 */
+.hljs-name {
+  color: var(--vscode-debugTokenExpression-name, #22863a);
+}
+
+/* 符号 / 选择器 */
+.hljs-symbol,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: var(--vscode-symbolIcon-fieldForeground, #e36209);
+}
+
+/* 强调 */
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: bold; }
+
+/* ========== 暗色主题特殊调整 ========== */
+body.vscode-dark {
+  --md-code-inline-bg: rgba(110, 118, 129, 0.4);
+  --md-table-stripe-bg: rgba(255, 255, 255, 0.03);
+}
+
+body.vscode-dark .hljs-keyword,
+body.vscode-dark .hljs-selector-tag,
+body.vscode-dark .hljs-section {
+  color: var(--vscode-debugTokenExpression-name, #ff7b72);
+}
+
+body.vscode-dark .hljs-string,
+body.vscode-dark .hljs-addition {
+  color: var(--vscode-debugTokenExpression-string, #a5d6ff);
+}
+
+body.vscode-dark .hljs-comment,
+body.vscode-dark .hljs-quote {
+  color: var(--vscode-debugTokenExpression-value, #8b949e);
+}
+
+body.vscode-dark .hljs-number,
+body.vscode-dark .hljs-regexp,
+body.vscode-dark .hljs-literal {
+  color: var(--vscode-debugTokenExpression-number, #79c0ff);
+}
+
+body.vscode-dark .hljs-type,
+body.vscode-dark .hljs-title,
+body.vscode-dark .hljs-class .hljs-title {
+  color: var(--vscode-symbolIcon-classForeground, #d2a8ff);
+}
+
+body.vscode-dark .hljs-variable,
+body.vscode-dark .hljs-template-variable,
+body.vscode-dark .hljs-attr {
+  color: var(--vscode-symbolIcon-variableForeground, #ffa657);
+}
+
+body.vscode-dark .hljs-name {
+  color: var(--vscode-debugTokenExpression-name, #7ee787);
+}
+
+/* ========== 高对比度主题 ========== */
+body.vscode-high-contrast .markdown-body pre {
+  border-width: 2px;
+}
+
+body.vscode-high-contrast .copy-btn {
+  border-width: 2px;
+}
+
+/* ========== 滚动条美化 ========== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-background, rgba(100, 100, 100, 0.4));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-hoverBackground, rgba(100, 100, 100, 0.7));
+}
+
+/* ========== 打印优化 ========== */
+@media print {
+  .edit-hint { display: none; }
+  .copy-btn { display: none; }
+  .markdown-body { max-width: 100%; padding: 20px; }
+}
